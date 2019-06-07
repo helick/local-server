@@ -1,0 +1,44 @@
+{
+    "name": "helick/local-server",
+    "type": "composer-plugin",
+    "description": "The Helick local server",
+    "keywords": [
+        "helick",
+        "local-server"
+    ],
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/helick/local-server/issues",
+        "source": "https://github.com/helick/local-server"
+    },
+    "authors": [
+        {
+            "name": "Evgenii Nasyrov",
+            "email": "evgenii@helick.io"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "composer-plugin-api": "^1.1"
+    },
+    "require-dev": {
+        "composer/composer": "^1.8",
+        "squizlabs/php_codesniffer": "^3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Helick\\LocalServer\\": "src/"
+        }
+    },
+    "extra": {
+        "class": "Helick\\LocalServer\\Plugin"
+    },
+    "scripts": {
+        "lint": [
+            "phpcs -p --standard=psr2 src"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
