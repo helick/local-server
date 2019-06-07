@@ -1,0 +1,117 @@
+version: '2.4'
+
+services:
+    proxy:
+        image: traefik
+        volumes:
+            - $PWD/conf/traefik.toml:/etc/traefik/traefik.toml
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - 80:80
+            - 8080:8080
+        networks:
+            - proxy
+        labels:
+            traefik.enable: false
+
+    nginx:
+        image: nginx:alpine
+        container_name: ${HELICK_PROJECT_NAME:-default}-nginx
+        volumes:
+            - $PWD/conf/vhost.conf:/etc/nginx/conf.d/default.conf
+            - ${VOLUME}:/code
+        networks:
+            - default
+            - proxy
+        depends_on:
+            php:
+                condition: service_started
+        labels:
+            traefik.docker.network: proxy
+            traefik.frontend.rule: HostRegexp:${HELICK_PROJECT_NAME:-default}.localtest.me,{subdomain:[a-z]+}.${HELICK_PROJECT_NAME:-default}.localtest.me
+            traefik.frontend.priority: 1
+
+    php:
+        build:
+            context: .
+        container_name: ${HELICK_PROJECT_NAME:-default}-php
+        volumes:
+            - ${VOLUME}:/code
+        networks:
+            - default
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            elasticsearch:
+                condition: service_started
+        labels:
+            traefik.enable: false
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: ${HELICK_PROJECT_NAME:-default}-phpmyadmin
+        networks:
+            - default
+            - proxy
+        environment:
+            PMA_HOST: mysql
+            PMA_USER: helick
+            PMA_PASSWORD: helick
+        depends_on:
+            mysql:
+                condition: service_healthy
+        labels:
+            traefik.docker.network: proxy
+            traefik.frontend.rule: Host:phpmyadmin.${HELICK_PROJECT_NAME:-default}.localtest.me
+            traefik.frontend.priority: 2
+
+    mysql:
+        image: mysql
+        container_name: ${HELICK_PROJECT_NAME:-default}-mysql
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_DATABASE: helick
+            MYSQL_USER: helick
+            MYSQL_PASSWORD: helick
+        volumes:
+            - mysql-data:/var/lib/mysql
+        networks:
+            - default
+        healthcheck:
+            test: mysqladmin ping
+        labels:
+            traefik.enable: false
+
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
+        container_name: ${HELICK_PROJECT_NAME:-default}-elasticsearch
+        environment:
+            bootstrap.memory_lock: "true"
+            ES_JAVA_OPTS: -Xms512m -Xmx512m
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - elasticsearch-data:/usr/share/elasticsearch/data
+        networks:
+            - default
+            - proxy
+        healthcheck:
+            test: nc -z localhost 9200
+        labels:
+            traefik.port: 9200
+            traefik.docker.network: proxy
+            traefik.frontend.rule: Host:elasticsearch.${HELICK_PROJECT_NAME:-default}.localtest.me
+            traefik.frontend.priority: 3
+
+volumes:
+    mysql-data:
+    elasticsearch-data:
+
+networks:
+    proxy:
+        external: true
