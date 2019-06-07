@@ -33,11 +33,20 @@ Once the initial install and download have completed, you should see the output:
 
 ``` sh
 Starting...
-
+Creating network "docker_default" with the default driver
+Creating volume "docker_mysql-data" with default driver
+Creating volume "docker_elasticsearch-data" with default driver
+Creating helick-skeleton-mysql         ... done
+Creating helick-skeleton-elasticsearch ... done
+Creating helick-skeleton-proxy         ... done
+Creating helick-skeleton-php           ... done
+Creating helick-skeleton-phpmyadmin    ... done
+Creating helick-skeleton-nginx         ... done
 Started.
-To access your site visit: http://helick.localtest.me/
-To access phpmyadmin please visit: http://phpmyadmin.helick.localtest.me/
-To access elasticsearch please visit: http://elasticsearch.helick.localtest.me/
+
+To access site please visit: http://helick-skeleton.localtest.me/
+To access phpmyadmin please visit: http://phpmyadmin.helick-skeleton.localtest.me/
+To access elasticsearch please visit: http://elasticsearch.helick-skeleton.localtest.me/
 ```
 
 ### Stopping the local server
@@ -52,13 +61,15 @@ To destroy the local server, simply run `composer local-server destroy`.
 
 To get details on the running local server status, run `composer local-server status`. You should see output similar to:
 
-```sh
-         Name                       Command                  State              Ports
---------------------------------------------------------------------------------------------
-docker_mysql_1           docker-entrypoint.sh --def ...   Up (healthy)   3306/tcp, 33060/tcp
-docker_nginx_1           nginx -g daemon off;             Up             80/tcp
-docker_php_1             docker-php-entrypoint php-fpm    Up             9000/tcp
-docker_redis_1           docker-entrypoint.sh redis ...   Up (healthy)   6379/tcp
+``` sh
+            Name                           Command                  State                         Ports
+--------------------------------------------------------------------------------------------------------------------------
+helick-skeleton-elasticsearch   /usr/local/bin/docker-entr ...   Up (healthy)   9200/tcp, 9300/tcp
+helick-skeleton-mysql           docker-entrypoint.sh --def ...   Up (healthy)   3306/tcp, 33060/tcp
+helick-skeleton-nginx           nginx -g daemon off;             Up             80/tcp
+helick-skeleton-php             docker-php-entrypoint php-fpm    Up             9000/tcp
+helick-skeleton-phpmyadmin      /run.sh supervisord -n -j  ...   Up             80/tcp, 9000/tcp
+helick-skeleton-proxy           /traefik                         Up             0.0.0.0:80->80/tcp, 0.0.0.0:8080->8080/tcp
 ```
 
 All containers should have a status of "Up". If they do not, you can inspect the logs for each service by running `composer local-server logs <service>`, for example, if `docker_mysql_1` shows a status other than "Up", run `composer local-server logs mysql`.
