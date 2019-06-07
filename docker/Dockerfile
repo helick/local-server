@@ -1,4 +1,4 @@
-FROM php:7-fpm-alpine
+FROM php:fpm-alpine
 
 # Apply custom php configuration
 COPY conf/php.ini /usr/local/etc/php
