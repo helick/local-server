@@ -3,6 +3,7 @@ version: '2.4'
 services:
     proxy:
         image: traefik
+        container_name: ${HELICK_PROJECT_NAME:-default}-proxy
         volumes:
             - $PWD/conf/traefik.toml:/etc/traefik/traefik.toml
             - /var/run/docker.sock:/var/run/docker.sock
