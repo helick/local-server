@@ -4,7 +4,13 @@ FROM php:fpm-alpine
 COPY conf/php.ini /usr/local/etc/php
 
 # Install required php dependencies
-RUN apk add --quiet --no-cache --virtual php-dependencies freetype-dev libjpeg-turbo-dev libpng-dev && \
-    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ && \
-    docker-php-ext-install gd opcache mysqli && \
+RUN apk add --quiet --no-cache --virtual php-dependencies $PHPIZE_DEPS imagemagick-dev && \
+    docker-php-ext-install bcmath && \
+    docker-php-ext-install exif && \
+    docker-php-ext-install opcache && \
+    docker-php-ext-install mysqli && \
+    export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
+    pecl install imagick && \
+    docker-php-ext-enable imagick && \
+    apk add --no-cache --virtual imagemagick && \
     apk del php-dependencies
