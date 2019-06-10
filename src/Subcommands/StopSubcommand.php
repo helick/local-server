@@ -42,8 +42,8 @@ final class StopSubcommand
 
 
         $compose = new Process('docker-compose stop', 'vendor/helick/local-server/docker', [
-            'HELICK_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'              => getcwd(),
+            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
+            'VOLUME'               => getcwd(),
         ]);
         $compose->run(function ($_, $buffer) {
             echo $buffer;

@@ -39,8 +39,8 @@ final class StatusSubcommand
     public function __invoke(InputInterface $input, OutputInterface $output): void
     {
         $compose = new Process('docker-compose ps', 'vendor/helick/local-server/docker', [
-            'HELICK_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'              => getcwd(),
+            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
+            'VOLUME'               => getcwd(),
         ]);
         $compose->setTimeout(0);
         $compose->run(function ($_, $buffer) {

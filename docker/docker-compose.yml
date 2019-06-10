@@ -3,7 +3,7 @@ version: '2.4'
 services:
     proxy:
         image: traefik
-        container_name: ${HELICK_PROJECT_NAME:-default}-proxy
+        container_name: ${COMPOSE_PROJECT_NAME:-default}-proxy
         volumes:
             - $PWD/conf/traefik.toml:/etc/traefik/traefik.toml
             - /var/run/docker.sock:/var/run/docker.sock
@@ -17,7 +17,7 @@ services:
 
     nginx:
         image: nginx:alpine
-        container_name: ${HELICK_PROJECT_NAME:-default}-nginx
+        container_name: ${COMPOSE_PROJECT_NAME:-default}-nginx
         volumes:
             - $PWD/conf/vhost.conf:/etc/nginx/conf.d/default.conf
             - ${VOLUME}:/code
@@ -29,13 +29,13 @@ services:
                 condition: service_started
         labels:
             traefik.docker.network: proxy
-            traefik.frontend.rule: HostRegexp:${HELICK_PROJECT_NAME:-default}.localtest.me,{subdomain:[a-z]+}.${HELICK_PROJECT_NAME:-default}.localtest.me
+            traefik.frontend.rule: HostRegexp:${COMPOSE_PROJECT_NAME:-default}.localtest.me,{subdomain:[a-z]+}.${COMPOSE_PROJECT_NAME:-default}.localtest.me
             traefik.frontend.priority: 1
 
     php:
         build:
             context: .
-        container_name: ${HELICK_PROJECT_NAME:-default}-php
+        container_name: ${COMPOSE_PROJECT_NAME:-default}-php
         volumes:
             - ${VOLUME}:/code
         networks:
@@ -50,7 +50,7 @@ services:
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
-        container_name: ${HELICK_PROJECT_NAME:-default}-phpmyadmin
+        container_name: ${COMPOSE_PROJECT_NAME:-default}-phpmyadmin
         networks:
             - default
             - proxy
@@ -63,12 +63,12 @@ services:
                 condition: service_healthy
         labels:
             traefik.docker.network: proxy
-            traefik.frontend.rule: Host:phpmyadmin.${HELICK_PROJECT_NAME:-default}.localtest.me
+            traefik.frontend.rule: Host:phpmyadmin.${COMPOSE_PROJECT_NAME:-default}.localtest.me
             traefik.frontend.priority: 2
 
     mysql:
         image: mysql
-        container_name: ${HELICK_PROJECT_NAME:-default}-mysql
+        container_name: ${COMPOSE_PROJECT_NAME:-default}-mysql
         command: --default-authentication-plugin=mysql_native_password
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
@@ -86,7 +86,7 @@ services:
 
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
-        container_name: ${HELICK_PROJECT_NAME:-default}-elasticsearch
+        container_name: ${COMPOSE_PROJECT_NAME:-default}-elasticsearch
         environment:
             bootstrap.memory_lock: "true"
             ES_JAVA_OPTS: -Xms512m -Xmx512m
@@ -104,7 +104,7 @@ services:
         labels:
             traefik.port: 9200
             traefik.docker.network: proxy
-            traefik.frontend.rule: Host:elasticsearch.${HELICK_PROJECT_NAME:-default}.localtest.me
+            traefik.frontend.rule: Host:elasticsearch.${COMPOSE_PROJECT_NAME:-default}.localtest.me
             traefik.frontend.priority: 3
 
 volumes:

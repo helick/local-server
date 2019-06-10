@@ -41,8 +41,8 @@ final class LogsSubcommand
         $service = $input->getArgument('options')[0];
 
         $compose = new Process('docker-compose logs -f ' . $service, 'vendor/helick/local-server/docker', [
-            'HELICK_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'              => getcwd(),
+            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
+            'VOLUME'               => getcwd(),
         ]);
         $compose->setTimeout(0);
         $compose->run(function ($_, $buffer) {
