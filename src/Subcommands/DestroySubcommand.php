@@ -41,8 +41,8 @@ final class DestroySubcommand
         $output->writeln('Destroying...');
 
         $compose = new Process('docker-compose down -v', 'vendor/helick/local-server/docker', [
-            'HELICK_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'              => getcwd(),
+            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
+            'VOLUME'               => getcwd(),
         ]);
         $compose->run(function ($_, $buffer) {
             echo $buffer;

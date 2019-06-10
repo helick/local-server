@@ -41,9 +41,9 @@ final class StartSubcommand
         $output->writeln('Starting...');
 
         $compose = new Process('docker-compose up -d', 'vendor/helick/local-server/docker', [
-            'HELICK_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'              => getcwd(),
-            'PATH'                => getenv('PATH'),
+            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
+            'VOLUME'               => getcwd(),
+            'PATH'                 => getenv('PATH'),
         ]);
         $compose->setTimeout(0);
         $failed = $compose->run(function ($_, $buffer) {

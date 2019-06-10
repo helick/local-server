@@ -55,7 +55,7 @@ final class CliSubcommand
         $hasStdout = !posix_isatty(STDOUT);
 
         $command = sprintf(
-            'cd %s; HELICK_PROJECT_NAME=%s VOLUME=%s docker-compose exec %s -u nobody php wp %s',
+            'cd %s; COMPOSE_PROJECT_NAME=%s VOLUME=%s docker-compose exec %s -u nobody php wp %s',
             'vendor/helick/local-server/docker',
             basename(getcwd()),
             getcwd(),
