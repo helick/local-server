@@ -2,10 +2,11 @@ version: '2.4'
 
 services:
     proxy:
-        image: traefik
+        build:
+            context: .
+            target: proxy
         container_name: ${COMPOSE_PROJECT_NAME:-default}-proxy
         volumes:
-            - $PWD/conf/traefik.toml:/etc/traefik/traefik.toml
             - /var/run/docker.sock:/var/run/docker.sock
         ports:
             - 80:80
@@ -16,11 +17,12 @@ services:
             traefik.enable: false
 
     nginx:
-        image: nginx:alpine
+        build:
+            context: .
+            target: frontend
         container_name: ${COMPOSE_PROJECT_NAME:-default}-nginx
         volumes:
-            - $PWD/conf/vhost.conf:/etc/nginx/conf.d/default.conf
-            - ${VOLUME}:/code
+            - ${VOLUME}:/code:cached
         networks:
             - default
             - proxy
@@ -35,9 +37,10 @@ services:
     php:
         build:
             context: .
+            target: backend
         container_name: ${COMPOSE_PROJECT_NAME:-default}-php
         volumes:
-            - ${VOLUME}:/code
+            - ${VOLUME}:/code:cached
         networks:
             - default
         depends_on:
@@ -106,6 +109,18 @@ services:
             traefik.docker.network: proxy
             traefik.frontend.rule: Host:elasticsearch.${COMPOSE_PROJECT_NAME:-default}.localtest.me
             traefik.frontend.priority: 3
+
+    mailhog:
+        image: mailhog/mailhog
+        container_name: ${COMPOSE_PROJECT_NAME:-default}-mailhog
+        networks:
+            - default
+            - proxy
+        labels:
+            traefik.port: 8025
+            traefik.docker.network: proxy
+            traefik.frontend.rule: Host:mailhog.${COMPOSE_PROJECT_NAME:-default}.localtest.me
+            traefik.frontend.priority: 4
 
 volumes:
     mysql-data:
