@@ -1,16 +1,34 @@
-FROM php:fpm-alpine
+#
+# Proxy
+#
+FROM traefik as proxy
 
-# Apply custom php configuration
+COPY conf/traefik.toml /etc/traefik
+
+#
+# Frontend
+#
+FROM nginx:alpine as frontend
+
+COPY conf/default.conf /etc/nginx/conf.d
+
+#
+# Backend
+#
+FROM php:fpm-alpine as backend
+
+WORKDIR /code
+
+RUN apk add --no-cache --virtual .persistent-deps imagemagick
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS imagemagick-dev
+
+RUN docker-php-ext-install bcmath exif opcache mysqli
+
+# Installing imagick
+RUN	pecl install imagick
+RUN docker-php-ext-enable imagick
+
+RUN apk del .build-deps
+
 COPY conf/php.ini /usr/local/etc/php
-
-# Install required php dependencies
-RUN apk add --quiet --no-cache --virtual php-dependencies $PHPIZE_DEPS imagemagick-dev && \
-    docker-php-ext-install bcmath && \
-    docker-php-ext-install exif && \
-    docker-php-ext-install opcache && \
-    docker-php-ext-install mysqli && \
-    export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" && \
-    pecl install imagick && \
-    docker-php-ext-enable imagick && \
-    apk add --no-cache --virtual imagemagick && \
-    apk del php-dependencies
+COPY conf/opcache.ini /usr/local/etc/php/conf.d
