@@ -5,6 +5,7 @@ namespace Helick\LocalServer\Subcommands;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 
 final class CliSubcommand
 {
@@ -51,18 +52,16 @@ final class CliSubcommand
             $options[] = '--url=http://' . basename(getcwd()) . '.localtest.me/';
         }
 
-        $hasStdin  = !posix_isatty(STDIN);
-        $hasStdout = !posix_isatty(STDOUT);
-
-        $command = sprintf(
-            'cd %s; COMPOSE_PROJECT_NAME=%s VOLUME=%s docker-compose exec %s -u nobody php wp %s',
+        $compose = new Process(
+            sprintf('docker-compose exec -T -u nobody php /code/vendor/bin/wp %s', implode(' ', $options)),
             'vendor/helick/local-server/docker',
-            basename(getcwd()),
-            getcwd(),
-            $hasStdin || $hasStdout ? '-T' : '',
-            implode(' ', $options)
+            [
+                'COMPOSE_PROJECT_NAME' => basename(getcwd()),
+                'VOLUME'               => getcwd(),
+            ]
         );
-
-        passthru($command, $output);
+        $compose->run(function ($_, $buffer) {
+            echo $buffer;
+        });
     }
 }
