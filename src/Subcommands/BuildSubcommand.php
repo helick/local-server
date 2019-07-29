@@ -44,6 +44,7 @@ final class BuildSubcommand
             'COMPOSE_PROJECT_NAME' => basename(getcwd()),
             'VOLUME'               => getcwd(),
         ]);
+        $compose->setTimeout(0);
         $compose->run(function ($_, $buffer) {
             echo $buffer;
         });
