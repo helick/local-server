@@ -16,6 +16,7 @@ final class Command extends BaseCommand
      * @var array
      */
     private $subcommands = [
+        'build'   => Subcommands\BuildSubcommand::class,
         'start'   => Subcommands\StartSubcommand::class,
         'stop'    => Subcommands\StopSubcommand::class,
         'destroy' => Subcommands\DestroySubcommand::class,
