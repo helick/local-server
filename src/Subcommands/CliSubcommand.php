@@ -58,6 +58,7 @@ final class CliSubcommand
             [
                 'COMPOSE_PROJECT_NAME' => basename(getcwd()),
                 'VOLUME'               => getcwd(),
+                'PATH'                 => getenv('PATH'),
             ]
         );
         $compose->run(function ($_, $buffer) {
