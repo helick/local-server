@@ -9,7 +9,7 @@ cache:
 
 install:
     - composer global require hirak/prestissimo
-    - composer install --ignore-platform-reqs --no-interaction
+    - composer install --no-interaction
 
 before_script:
     - phpenv config-rm xdebug.ini
