@@ -1,0 +1,18 @@
+language: php
+
+php:
+    - 7.3
+
+cache:
+    directories:
+        - $HOME/.composer/cache
+
+install:
+    - composer global require hirak/prestissimo
+    - composer install --ignore-platform-reqs --no-interaction
+
+before_script:
+    - phpenv config-rm xdebug.ini
+
+script:
+    - composer lint
