@@ -55,8 +55,18 @@ final class StartSubcommand
         }
 
         $output->writeln('Started.');
-        $output->writeln('To access site please visit: http://' . basename(getcwd()) . '.localtest.me/');
-        $output->writeln('To access phpmyadmin please visit: http://phpmyadmin.' . basename(getcwd()) . '.localtest.me/');
-        $output->writeln('To access elasticsearch please visit: http://elasticsearch.' . basename(getcwd()) . '.localtest.me/');
+        $output->writeln('');
+        $output->writeln(sprintf(
+            'To access site please visit: http://%s.localtest.me/',
+            basename(getcwd())
+        ));
+        $output->writeln(sprintf(
+            'To access phpmyadmin please visit: http://phpmyadmin.%s.localtest.me/',
+            basename(getcwd())
+        ));
+        $output->writeln(sprintf(
+            'To access elasticsearch please visit: http://elasticsearch.%s.localtest.me/',
+            basename(getcwd())
+        ));
     }
 }
