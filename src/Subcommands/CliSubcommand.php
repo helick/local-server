@@ -2,31 +2,17 @@
 
 namespace Helick\LocalServer\Subcommands;
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
-final class CliSubcommand
+final class CliSubcommand extends Subcommand
 {
     /**
-     * The application instance.
+     * The process' command string.
      *
-     * @var Application
+     * @var string
      */
-    private $application;
-
-    /**
-     * Create a subcommand instance.
-     *
-     * @param Application $application
-     *
-     * @return void
-     */
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
+    const COMMAND = 'docker-compose exec -T -u nobody php vendor/bin/wp %s';
 
     /**
      * Invoke the subcommand.
@@ -40,29 +26,26 @@ final class CliSubcommand
     {
         $options = $input->getArgument('options');
 
-        $hasUrlOption = false;
+        if (!$this->hasUrlOption($options)) {
+            $options[] = sprintf('--url=http://%s.localtest.me/', basename(getcwd()));
+        }
+
+        $this->runProcess(sprintf(static::COMMAND, implode(' ', $options)));
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return bool
+     */
+    protected function hasUrlOption(array $options): bool
+    {
         foreach ($options as $option) {
             if (strpos($option, '--url=') === 0) {
-                $hasUrlOption = true;
-                break;
+                return true;
             }
         }
 
-        if (!$hasUrlOption) {
-            $options[] = '--url=http://' . basename(getcwd()) . '.localtest.me/';
-        }
-
-        $compose = new Process(
-            sprintf('docker-compose exec -T -u nobody php /code/vendor/bin/wp %s', implode(' ', $options)),
-            'vendor/helick/local-server/docker',
-            [
-                'COMPOSE_PROJECT_NAME' => basename(getcwd()),
-                'VOLUME'               => getcwd(),
-                'PATH'                 => getenv('PATH'),
-            ]
-        );
-        $compose->run(function ($_, $buffer) {
-            echo $buffer;
-        });
+        return false;
     }
 }

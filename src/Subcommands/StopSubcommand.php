@@ -2,31 +2,17 @@
 
 namespace Helick\LocalServer\Subcommands;
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
-final class StopSubcommand
+final class StopSubcommand extends Subcommand
 {
     /**
-     * The application instance.
+     * The process' command string.
      *
-     * @var Application
+     * @var string
      */
-    private $application;
-
-    /**
-     * Create a subcommand instance.
-     *
-     * @param Application $application
-     *
-     * @return void
-     */
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
+    const COMMAND = 'docker-compose stop';
 
     /**
      * Invoke the subcommand.
@@ -40,14 +26,7 @@ final class StopSubcommand
     {
         $output->writeln('Stopping...');
 
-
-        $compose = new Process('docker-compose stop', 'vendor/helick/local-server/docker', [
-            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'               => getcwd(),
-        ]);
-        $compose->run(function ($_, $buffer) {
-            echo $buffer;
-        });
+        $this->runProcess(static::COMMAND);
 
         $output->writeln('Stopped.');
     }

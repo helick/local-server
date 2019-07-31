@@ -2,31 +2,17 @@
 
 namespace Helick\LocalServer\Subcommands;
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
-final class StartSubcommand
+final class StartSubcommand extends Subcommand
 {
     /**
-     * The application instance.
+     * The process' command string.
      *
-     * @var Application
+     * @var string
      */
-    private $application;
-
-    /**
-     * Create a subcommand instance.
-     *
-     * @param Application $application
-     *
-     * @return void
-     */
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
+    const COMMAND = 'docker-compose up -d';
 
     /**
      * Invoke the subcommand.
@@ -40,23 +26,25 @@ final class StartSubcommand
     {
         $output->writeln('Starting...');
 
-        $compose = new Process('docker-compose up -d', 'vendor/helick/local-server/docker', [
-            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'               => getcwd(),
-            'PATH'                 => getenv('PATH'),
-        ]);
-        $compose->setTimeout(0);
-        $failed = $compose->run(function ($_, $buffer) {
-            echo $buffer;
-        });
+        $process = $this->runProcess(static::COMMAND);
 
-        if ($failed) {
+        if (!$process->isSuccessful()) {
             return;
         }
 
         $output->writeln('Started.');
-        $output->writeln('To access site please visit: http://' . basename(getcwd()) . '.localtest.me/');
-        $output->writeln('To access phpmyadmin please visit: http://phpmyadmin.' . basename(getcwd()) . '.localtest.me/');
-        $output->writeln('To access elasticsearch please visit: http://elasticsearch.' . basename(getcwd()) . '.localtest.me/');
+        $output->writeln('');
+        $output->writeln(sprintf(
+            'To access site please visit: http://%s.localtest.me/',
+            basename(getcwd())
+        ));
+        $output->writeln(sprintf(
+            'To access phpmyadmin please visit: http://phpmyadmin.%s.localtest.me/',
+            basename(getcwd())
+        ));
+        $output->writeln(sprintf(
+            'To access elasticsearch please visit: http://elasticsearch.%s.localtest.me/',
+            basename(getcwd())
+        ));
     }
 }
