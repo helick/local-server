@@ -4,10 +4,16 @@ namespace Helick\LocalServer\Subcommands;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 final class CliSubcommand extends Subcommand
 {
+    /**
+     * The process' command string.
+     *
+     * @var string
+     */
+    const COMMAND = 'docker-compose exec -T -u nobody php vendor/bin/wp %s';
+
     /**
      * Invoke the subcommand.
      *
@@ -20,29 +26,26 @@ final class CliSubcommand extends Subcommand
     {
         $options = $input->getArgument('options');
 
-        $hasUrlOption = false;
+        if (!$this->hasUrlOption($options)) {
+            $options[] = sprintf('--url=http://%s.localtest.me/', basename(getcwd()));
+        }
+
+        $this->runProcess(sprintf(static::COMMAND, implode(' ', $options)));
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return bool
+     */
+    protected function hasUrlOption(array $options): bool
+    {
         foreach ($options as $option) {
             if (strpos($option, '--url=') === 0) {
-                $hasUrlOption = true;
-                break;
+                return true;
             }
         }
 
-        if (!$hasUrlOption) {
-            $options[] = '--url=http://' . basename(getcwd()) . '.localtest.me/';
-        }
-
-        $process = new Process(
-            sprintf('docker-compose exec -T -u nobody php /code/vendor/bin/wp %s', implode(' ', $options)),
-            'vendor/helick/local-server/docker',
-            [
-                'COMPOSE_PROJECT_NAME' => basename(getcwd()),
-                'VOLUME'               => getcwd(),
-                'PATH'                 => getenv('PATH'),
-            ]
-        );
-        $process->run(function ($_, $buffer) {
-            echo $buffer;
-        });
+        return false;
     }
 }

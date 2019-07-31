@@ -4,10 +4,16 @@ namespace Helick\LocalServer\Subcommands;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Process;
 
 final class LogsSubcommand extends Subcommand
 {
+    /**
+     * The process' command string.
+     *
+     * @var string
+     */
+    const COMMAND = 'docker-compose logs -f %s';
+
     /**
      * Invoke the subcommand.
      *
@@ -20,13 +26,6 @@ final class LogsSubcommand extends Subcommand
     {
         $service = $input->getArgument('options')[0];
 
-        $process = new Process('docker-compose logs -f ' . $service, 'vendor/helick/local-server/docker', [
-            'COMPOSE_PROJECT_NAME' => basename(getcwd()),
-            'VOLUME'               => getcwd(),
-        ]);
-        $process->setTimeout(0);
-        $process->run(function ($_, $buffer) {
-            echo $buffer;
-        });
+        $this->runProcess(sprintf(static::COMMAND, $service));
     }
 }
