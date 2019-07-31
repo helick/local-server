@@ -2,32 +2,12 @@
 
 namespace Helick\LocalServer\Subcommands;
 
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\Process;
 
-final class BuildSubcommand
+final class BuildSubcommand extends Subcommand
 {
-    /**
-     * The application instance.
-     *
-     * @var Application
-     */
-    private $application;
-
-    /**
-     * Create a subcommand instance.
-     *
-     * @param Application $application
-     *
-     * @return void
-     */
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
-
     /**
      * Invoke the subcommand.
      *
