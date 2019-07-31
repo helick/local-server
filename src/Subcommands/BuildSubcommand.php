@@ -20,12 +20,12 @@ final class BuildSubcommand extends Subcommand
     {
         $output->writeln('Building...');
 
-        $compose = new Process('docker-compose build', 'vendor/helick/local-server/docker', [
+        $process = new Process('docker-compose build', 'vendor/helick/local-server/docker', [
             'COMPOSE_PROJECT_NAME' => basename(getcwd()),
             'VOLUME'               => getcwd(),
         ]);
-        $compose->setTimeout(0);
-        $compose->run(function ($_, $buffer) {
+        $process->setTimeout(0);
+        $process->run(function ($_, $buffer) {
             echo $buffer;
         });
 

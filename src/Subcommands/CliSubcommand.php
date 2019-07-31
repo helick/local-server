@@ -32,7 +32,7 @@ final class CliSubcommand extends Subcommand
             $options[] = '--url=http://' . basename(getcwd()) . '.localtest.me/';
         }
 
-        $compose = new Process(
+        $process = new Process(
             sprintf('docker-compose exec -T -u nobody php /code/vendor/bin/wp %s', implode(' ', $options)),
             'vendor/helick/local-server/docker',
             [
@@ -41,7 +41,7 @@ final class CliSubcommand extends Subcommand
                 'PATH'                 => getenv('PATH'),
             ]
         );
-        $compose->run(function ($_, $buffer) {
+        $process->run(function ($_, $buffer) {
             echo $buffer;
         });
     }

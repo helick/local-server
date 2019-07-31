@@ -18,12 +18,12 @@ final class StatusSubcommand extends Subcommand
      */
     public function __invoke(InputInterface $input, OutputInterface $output): void
     {
-        $compose = new Process('docker-compose ps', 'vendor/helick/local-server/docker', [
+        $process = new Process('docker-compose ps', 'vendor/helick/local-server/docker', [
             'COMPOSE_PROJECT_NAME' => basename(getcwd()),
             'VOLUME'               => getcwd(),
         ]);
-        $compose->setTimeout(0);
-        $compose->run(function ($_, $buffer) {
+        $process->setTimeout(0);
+        $process->run(function ($_, $buffer) {
             echo $buffer;
         });
     }

@@ -20,13 +20,13 @@ final class StartSubcommand extends Subcommand
     {
         $output->writeln('Starting...');
 
-        $compose = new Process('docker-compose up -d', 'vendor/helick/local-server/docker', [
+        $process = new Process('docker-compose up -d', 'vendor/helick/local-server/docker', [
             'COMPOSE_PROJECT_NAME' => basename(getcwd()),
             'VOLUME'               => getcwd(),
             'PATH'                 => getenv('PATH'),
         ]);
-        $compose->setTimeout(0);
-        $failed = $compose->run(function ($_, $buffer) {
+        $process->setTimeout(0);
+        $failed = $process->run(function ($_, $buffer) {
             echo $buffer;
         });
 

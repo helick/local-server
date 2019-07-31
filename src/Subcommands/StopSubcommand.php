@@ -20,11 +20,11 @@ final class StopSubcommand extends Subcommand
     {
         $output->writeln('Stopping...');
 
-        $compose = new Process('docker-compose stop', 'vendor/helick/local-server/docker', [
+        $process = new Process('docker-compose stop', 'vendor/helick/local-server/docker', [
             'COMPOSE_PROJECT_NAME' => basename(getcwd()),
             'VOLUME'               => getcwd(),
         ]);
-        $compose->run(function ($_, $buffer) {
+        $process->run(function ($_, $buffer) {
             echo $buffer;
         });
 
