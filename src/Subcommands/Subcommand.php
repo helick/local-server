@@ -13,7 +13,7 @@ abstract class Subcommand
      *
      * @var Application
      */
-    private $application;
+    protected $application;
 
     /**
      * Create a subcommand instance.
