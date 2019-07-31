@@ -40,6 +40,8 @@ final class Command extends BaseCommand
                  <<<EOT
 Run the local server.
 
+Build the local server:
+    build
 Start the local server:
     start
 Stop the local server:
