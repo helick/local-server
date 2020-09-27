@@ -1,7 +1,7 @@
 #
 # Proxy
 #
-FROM traefik as proxy
+FROM traefik:alpine as proxy
 
 COPY conf/traefik.toml /etc/traefik
 
